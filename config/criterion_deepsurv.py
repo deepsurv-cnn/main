@@ -36,7 +36,7 @@ class NegativeLogLikelihood(nn.Module):
     #def __init__(self, config, device):
     def __init__(self, device):
         super(NegativeLogLikelihood, self).__init__()
-        self.L2_reg = 0.08   # config['l2_reg']
+        self.L2_reg = 0.05   # config['l2_reg']
         # self.L2_reg = 0    # When 0, no Regularization
         self.reg = Regularization(order=2, weight_decay=self.L2_reg)
         self.device = device
@@ -59,17 +59,8 @@ class NegativeLogLikelihood(nn.Module):
         l3 = torch.log(l2).reshape(-1, 1)
         num_occurs = torch.sum(e)
 
-        if num_occurs.item() == 0.0:
-            # To avoid dividing with zero
-            #neg_log_loss = torch.tensor([0.0], requires_grad = True)
-            #neg_log_loss = torch.tensor([1.0], requires_grad = True)
-            #l2_loss = self.reg(model)
-            #loss = neg_log_loss + l2_loss
-            loss = torch.tensor([1e-7], requires_grad = True)
-
-        else:
-            neg_log_loss = -torch.sum((risk_pred-l3) * e) / num_occurs
-            l2_loss = self.reg(model)
-            loss = neg_log_loss + l2_loss
+        neg_log_loss = -torch.sum((risk_pred-l3) * e) / num_occurs
+        l2_loss = self.reg(model)
+        loss = neg_log_loss + l2_loss
 
         return loss
