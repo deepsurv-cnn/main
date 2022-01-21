@@ -33,33 +33,19 @@ class Regularization(object):
 
 
 class NegativeLogLikelihood(nn.Module):
-    #def __init__(self, config, device):
     def __init__(self, device):
         super(NegativeLogLikelihood, self).__init__()
-        self.L2_reg = 0.05   # config['l2_reg']
-        # self.L2_reg = 0    # When 0, no Regularization
+        self.L2_reg = 0.05
         self.reg = Regularization(order=2, weight_decay=self.L2_reg)
         self.device = device
 
     def forward(self, risk_pred, y, e, model):
-        """
         mask = torch.ones(y.shape[0], y.shape[0]).to(self.device)
         mask[(y.T - y) > 0] = 0
         log_loss = torch.exp(risk_pred) * mask
         log_loss = torch.sum(log_loss, dim=0) / torch.sum(mask, dim=0)
         log_loss = torch.log(log_loss).reshape(-1, 1)
         neg_log_loss = -torch.sum((risk_pred-log_loss) * e) / torch.sum(e)
-        l2_loss = self.reg(model)
-        """
-
-        mask = torch.ones(y.shape[0], y.shape[0]).to(self.device)
-        mask[(y.T - y) > 0] = 0
-        l1 = torch.exp(risk_pred) * mask
-        l2 = torch.sum(l1, dim=0) / torch.sum(mask, dim=0)
-        l3 = torch.log(l2).reshape(-1, 1)
-        num_occurs = torch.sum(e)
-
-        neg_log_loss = -torch.sum((risk_pred-l3) * e) / num_occurs
         l2_loss = self.reg(model)
         loss = neg_log_loss + l2_loss
 
