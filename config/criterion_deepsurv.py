@@ -48,5 +48,4 @@ class NegativeLogLikelihood(nn.Module):
         neg_log_loss = -torch.sum((risk_pred-log_loss) * e) / torch.sum(e)
         l2_loss = self.reg(model)
         loss = neg_log_loss + l2_loss
-
         return loss
